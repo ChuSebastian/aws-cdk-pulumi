@@ -1,0 +1,27 @@
+import pulumi
+import pulumi_aws as aws
+
+# IDs conocidos
+vpc_id = "vpc-00f235fef51d566b5"
+subnet_id = "subnet-0dabdbd38e53c0f0a"
+security_group_id = "sg-03e7e9534001ac5a8"
+
+# Crear instancia EC2
+instance = aws.ec2.Instance("mi-instancia-pulumi",
+    ami="ami-043cbf1cf918dd74f",  # ID de la AMI específica
+    instance_type="t2.micro",
+    key_name="vockey",
+    vpc_security_group_ids=[security_group_id],
+    subnet_id=subnet_id,
+    iam_instance_profile="LabInstanceProfile",
+    root_block_device={
+        "volume_size": 20,
+        "volume_type": "gp2"
+    },
+    associate_public_ip_address=True,
+    tags={
+        "Name": "PulumiMV"
+    }
+)
+
+pulumi.export("public_ip", instance.public_ip)
